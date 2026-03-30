@@ -13,7 +13,7 @@ INSERT INTO Events (venue_id, name, event_date, event_time, event_type) VALUES
 (3, 'Футбольний матч', '2026-11-05', '20:00', 'Спорт');
 
 INSERT INTO Customers (username, first_name, last_name, email, phone, password_hash, registration_date) VALUES
-('ivan_pedrenko', 'Іван', 'Петренко', 'ivan.goida@gmail.com', '0501112233', 'hash_ivan_123', '2026-03-01'),
+('ivan_pedrenko', 'Іван', 'Білий', 'ivan.goida@gmail.com', '0501112233', 'hash_ivan_123', '2026-03-01'),
 ('artem_davydchuk', 'Артем', 'Давидчук', 'artem.davydchuk@gmail.com', '0671112233', 'hash_artem_123', '2026-03-05'),
 ('andrii_vovk', 'Андрій', 'Вовк', 'andrii.vovk@edu.kpi.ua', '0631112233', 'hash_andrii_123', '2026-03-10');
 
