@@ -242,7 +242,9 @@ INSERT INTO Product (CategoryID, Brand, Model, Price, StockQuantity) VALUES
 INSERT INTO CustomerOrder (CustomerID, Status, ShippingAddress, TotalAmount) VALUES
     (1, 'New', 'Київ, вул. Хрещатик, 15, кв. 4', 35000.00),
     (2, 'Paid', 'Львів, пл. Ринок, 10, кв. 2', 13000.00),
-    (3, 'Shipped', 'Одеса, вул. Дерибасівська, 5', 95000.00);
+    (3, 'Shipped', 'Одеса, вул. Дерибасівська, 5', 95000.00),
+    (4, 'New', 'Київ, вул. Богатирська 34/12', 12500.00),
+    (4, 'Shipped', 'Київ, вул. Виноградарська 44а, кв. 76', 35000.00);
 
 INSERT INTO OrderItem (OrderID, ProductID, Quantity, UnitPrice) VALUES
     (1, 1, 1, 35000.00),
