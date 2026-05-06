@@ -1,0 +1,226 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model brand {
+  brandid Int       @id @default(autoincrement())
+  name    String    @unique @db.VarChar(100)
+  product product[]
+}
+
+model category {
+  categoryid  Int       @id @default(autoincrement())
+  name        String    @unique @db.VarChar(100)
+  description String?
+  product     product[]
+}
+
+model customer {
+  customerid      Int               @id @default(autoincrement())
+  firstname       String            @db.VarChar(100)
+  lastname        String            @db.VarChar(100)
+  email           String            @unique @db.VarChar(255)
+  phone           String?           @db.VarChar(20)
+  passwordhash    String            @db.VarChar(255)
+  createdat       DateTime          @default(now()) @db.Timestamp(6)
+  customerorder   customerorder[]
+  instrumentbuyin instrumentbuyin[]
+  rent            rent[]
+  repairservice   repairservice[]
+  review          review[]
+  setupservice    setupservice[]
+  studiobooking   studiobooking[]
+}
+
+model customerorder {
+  orderid         Int          @id @default(autoincrement())
+  customerid      Int
+  orderdate       DateTime     @default(now()) @db.Timestamp(6)
+  status          order_status @default(New)
+  shippingaddress String       @db.VarChar(255)
+  customer        customer     @relation(fields: [customerid], references: [customerid], onDelete: Cascade, onUpdate: NoAction)
+  orderitem       orderitem[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model instrumentbuyin {
+  buyinid      Int                  @id @default(autoincrement())
+  customerid   Int
+  productid    Int                  @unique
+  condition    instrument_condition
+  status       buyin_status
+  buyinprice   Decimal              @db.Decimal(10, 2)
+  sellingprice Decimal              @db.Decimal(10, 2)
+  customer     customer             @relation(fields: [customerid], references: [customerid], onDelete: Cascade, onUpdate: NoAction)
+  product      product              @relation(fields: [productid], references: [productid], onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model orderitem {
+  orderitemid   Int           @id @default(autoincrement())
+  orderid       Int
+  productid     Int
+  quantity      Int
+  unitprice     Decimal       @db.Decimal(10, 2)
+  customerorder customerorder @relation(fields: [orderid], references: [orderid], onDelete: Cascade, onUpdate: NoAction)
+  product       product       @relation(fields: [productid], references: [productid], onUpdate: NoAction)
+
+  @@unique([orderid, productid])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model product {
+  productid       Int              @id @default(autoincrement())
+  categoryid      Int
+  brandid         Int
+  model           String           @db.VarChar(100)
+  price           Decimal          @db.Decimal(10, 2)
+  stockquantity   Int
+  isavailable     Boolean          @default(true)
+  instrumentbuyin instrumentbuyin?
+  orderitem       orderitem[]
+  brand           brand            @relation(fields: [brandid], references: [brandid], onUpdate: NoAction)
+  category        category         @relation(fields: [categoryid], references: [categoryid], onUpdate: NoAction)
+  rent            rent[]
+  repairservice   repairservice[]
+  review          review[]
+  setupservice    setupservice[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model rent {
+  rentid              Int         @id @default(autoincrement())
+  customerid          Int
+  productid           Int
+  pickupdate          DateTime    @db.Timestamp(6)
+  duration            Int
+  returndate          DateTime    @db.Timestamp(6)
+  status              rent_status
+  percentagefromprice Decimal     @db.Decimal(5, 2)
+  depositamount       Decimal     @db.Decimal(10, 2)
+  customer            customer    @relation(fields: [customerid], references: [customerid], onDelete: Cascade, onUpdate: NoAction)
+  product             product     @relation(fields: [productid], references: [productid], onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model repairservice {
+  repairid           Int           @id @default(autoincrement())
+  customerid         Int
+  productid          Int
+  accepteddate       DateTime      @db.Timestamp(6)
+  completiondate     DateTime?     @db.Timestamp(6)
+  status             repair_status
+  problemdescription String
+  repairdetails      String
+  estimatedprice     Decimal       @db.Decimal(10, 2)
+  finalprice         Decimal?      @db.Decimal(10, 2)
+  customer           customer      @relation(fields: [customerid], references: [customerid], onDelete: Cascade, onUpdate: NoAction)
+  product            product       @relation(fields: [productid], references: [productid], onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model setupservice {
+  setupid       Int          @id @default(autoincrement())
+  customerid    Int
+  productid     Int
+  accepteddate  DateTime     @db.Timestamp(6)
+  completeddate DateTime?    @db.Timestamp(6)
+  status        setup_status
+  setuptype     setup_type
+  price         Decimal      @db.Decimal(10, 2)
+  customer      customer     @relation(fields: [customerid], references: [customerid], onDelete: Cascade, onUpdate: NoAction)
+  product       product      @relation(fields: [productid], references: [productid], onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model studiobooking {
+  studioid   Int                   @id @default(autoincrement())
+  customerid Int
+  recorddate DateTime              @db.Timestamp(6)
+  status     studio_booking_status
+  duration   Int
+  price      Decimal               @db.Decimal(10, 2)
+  customer   customer              @relation(fields: [customerid], references: [customerid], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model review {
+  reviewid   Int      @id @default(autoincrement())
+  productid  Int
+  customerid Int
+  rating     Int
+  comment    String?
+  createdat  DateTime @default(now()) @db.Timestamp(6)
+
+  product  product  @relation(fields: [productid], references: [productid], onDelete: Cascade, onUpdate: NoAction)
+  customer customer @relation(fields: [customerid], references: [customerid], onDelete: Cascade, onUpdate: NoAction)
+}
+
+enum buyin_status {
+  Accepted
+  Rejected
+  PreparedForSale
+  Sold
+}
+
+enum instrument_condition {
+  LikeNew
+  Excellent
+  Good
+  Fair
+  NeedsRepair
+}
+
+enum message_role {
+  user
+  ai_model
+}
+
+enum order_status {
+  New
+  Paid
+  Shipped
+  Delivered
+  Cancelled
+}
+
+enum rent_status {
+  Active
+  Returned
+  Cancelled
+}
+
+enum repair_status {
+  Accepted
+  InProgress
+  WaitingForParts
+  Completed
+  Cancelled
+  IssuedToCustomer
+}
+
+enum setup_status {
+  Accepted
+  InProgress
+  Completed
+  Cancelled
+  IssuedToCustomer
+}
+
+enum setup_type {
+  Basic
+  Full
+  StringsReplacement
+  IntonationAdjustment
+  NeckAdjustment
+}
+
+enum studio_booking_status {
+  Booked
+  Completed
+  Cancelled
+}
